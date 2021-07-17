@@ -59,10 +59,10 @@ int main(int argc, char *argv[])
 	float win_ar = (float)INIT_WIN_W / INIT_WIN_H; // window's aspect ratio
 	SDL_Rect texr;
         if (img_ar < win_ar) {
-                texr.h = INIT_WIN_H;
+                texr.h = win_h;
                 texr.w = texr.h * img_ar;
         } else {
-                texr.w = INIT_WIN_W;
+                texr.w = win_w;
                 texr.h = texr.w / img_ar;
         }
 	texr.x = (win_w - texr.w) / 2;
@@ -80,6 +80,23 @@ int main(int argc, char *argv[])
                                 if (e.key.keysym.sym == SDLK_ESCAPE)
                                         run = false;
                                 break;
+                        case SDL_WINDOWEVENT:
+                                switch (e.window.event) {
+                                case SDL_WINDOWEVENT_RESIZED:
+                                        win_w = e.window.data1;
+                                        win_h = e.window.data2;
+                                        img_ar = (float)img_w / img_h;
+                                        win_ar = (float)win_w / win_h;
+                                        if (img_ar < win_ar) {
+                                                texr.h = win_h;
+                                                texr.w = texr.h * img_ar;
+                                        } else {
+                                                texr.w = win_w;
+                                                texr.h = texr.w / img_ar;
+                                        }
+                                        texr.x = (win_w - texr.w) / 2;
+                                        texr.y = (win_h - texr.h) / 2;
+                                }
                         default:
                                 break;
                         }
