@@ -11,6 +11,9 @@
 #include <SDL2/SDL_video.h>
 #include <SDL2/SDL_image.h>
 
+#define INIT_WIN_W 640
+#define INIT_WIN_H 480
+
 using std::string;
 
 int init();
@@ -37,7 +40,7 @@ int main(int argc, char *argv[])
 
 	win = SDL_CreateWindow(fname.c_str(),
 			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-			640, 480,
+			INIT_WIN_W, INIT_WIN_H,
 			0);
 	if (win == NULL)
 		SDL_Log("Unable to create a window: %s", SDL_GetError());
@@ -46,17 +49,22 @@ int main(int argc, char *argv[])
 	if (renderer == NULL)
 		SDL_Log("Unable to create a renderer: %s", SDL_GetError());
 
-	img = IMG_LoadTexture(renderer, argv[1]);
 	int w, h;
+	img = IMG_LoadTexture(renderer, argv[1]);
 	SDL_QueryTexture(img, NULL, NULL, &w, &h);
-	SDL_SetWindowSize(win, w, h);
-	SDL_SetWindowPosition(win,
-			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+
+	float img_ar = (float)w / h;                   // image's aspect ratio
+	float win_ar = (float)INIT_WIN_W / INIT_WIN_H; // window's aspect ratio
 	SDL_Rect texr;
 	texr.x = 0;
 	texr.y = 0;
-	texr.w = w;
-	texr.h = h;
+        if (img_ar < win_ar) {
+                texr.h = INIT_WIN_H;
+                texr.w = texr.h * img_ar;
+        } else {
+                texr.w = INIT_WIN_W;
+                texr.h = texr.w / img_ar;
+        }
 
 	while (1) {
 		SDL_Event e;
