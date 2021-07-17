@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 	win = SDL_CreateWindow(fname.c_str(),
 			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 			INIT_WIN_W, INIT_WIN_H,
-			0);
+			SDL_WINDOW_RESIZABLE);
 	if (win == NULL)
 		SDL_Log("Unable to create a window: %s", SDL_GetError());
 
@@ -68,12 +68,21 @@ int main(int argc, char *argv[])
 	texr.x = (win_w - texr.w) / 2;
 	texr.y = (win_h - texr.h) / 2;
 
-	while (1) {
+        bool run = true;
+	while (run) {
 		SDL_Event e;
 		if (SDL_PollEvent(&e)) {
-			if ((e.type == SDL_QUIT) || (e.type == SDL_KEYUP &&
-					e.key.keysym.sym == SDLK_ESCAPE))
-				break;
+                        switch (e.type) {
+                        case SDL_QUIT:
+                                run = false;
+                                break;
+                        case SDL_KEYUP:
+                                if (e.key.keysym.sym == SDLK_ESCAPE)
+                                        run = false;
+                                break;
+                        default:
+                                break;
+                        }
 		}
 		SDL_RenderClear(renderer);
 		SDL_RenderCopy(renderer, img, NULL, &texr);
