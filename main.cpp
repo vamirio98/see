@@ -49,15 +49,15 @@ int main(int argc, char *argv[])
 	if (renderer == NULL)
 		SDL_Log("Unable to create a renderer: %s", SDL_GetError());
 
-	int w, h;
+        int win_w, win_h;
+	int img_w, img_h;
+        SDL_GetWindowSize(win, &win_w, &win_h);
 	img = IMG_LoadTexture(renderer, argv[1]);
-	SDL_QueryTexture(img, NULL, NULL, &w, &h);
+	SDL_QueryTexture(img, NULL, NULL, &img_w, &img_h);
 
-	float img_ar = (float)w / h;                   // image's aspect ratio
+	float img_ar = (float)img_w / img_h;                   // image's aspect ratio
 	float win_ar = (float)INIT_WIN_W / INIT_WIN_H; // window's aspect ratio
 	SDL_Rect texr;
-	texr.x = 0;
-	texr.y = 0;
         if (img_ar < win_ar) {
                 texr.h = INIT_WIN_H;
                 texr.w = texr.h * img_ar;
@@ -65,6 +65,8 @@ int main(int argc, char *argv[])
                 texr.w = INIT_WIN_W;
                 texr.h = texr.w / img_ar;
         }
+	texr.x = (win_w - texr.w) / 2;
+	texr.y = (win_h - texr.h) / 2;
 
 	while (1) {
 		SDL_Event e;
