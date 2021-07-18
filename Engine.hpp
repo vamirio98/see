@@ -1,5 +1,5 @@
 /**
- * Window.hpp - the Window class
+ * Engine.hpp - the Engine class
  *
  * Created by Haoyuan Li on 2021/07/17
  * Last Modified: 2021/07/17 23:52:08
@@ -25,7 +25,7 @@ struct See_content {
         See_rect area;
 };
 
-class Window {
+class Engine {
 private:
         string title{""};
         int w{640};
@@ -35,8 +35,8 @@ private:
         See_content content;
 
 public:
-        Window(string title, string fname);
-        ~Window();
+        Engine(string title, string fname);
+        ~Engine();
         void display();
         void fit_window();
 };

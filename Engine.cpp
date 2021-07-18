@@ -1,13 +1,13 @@
 /**
- * Window.cpp - the Window class
+ * Engine.cpp - the Engine class
  *
  * Created by Haoyuan Li on 2021/07/17
  * Last Modified: 2021/07/17 23:36:53
  */
 
-#include "Window.hpp"
+#include "Engine.hpp"
 
-Window::Window(string title, string fname)
+Engine::Engine(string title, string fname)
 {
         this->title = title;
         win = SDL_CreateWindow(title.c_str(),
@@ -22,21 +22,21 @@ Window::Window(string title, string fname)
         content.area.y = 0;
 }
 
-Window::~Window()
+Engine::~Engine()
 {
         SDL_DestroyTexture(content.texture);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(win);
 }
 
-void Window::display()
+void Engine::display()
 {
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, content.texture, NULL, &(content.area));
         SDL_RenderPresent(renderer);
 }
 
-void Window::fit_window()
+void Engine::fit_window()
 {
         SDL_GetWindowSize(win, &w, &h);
         int texr_w, texr_h;

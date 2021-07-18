@@ -10,10 +10,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_video.h>
 #include <SDL2/SDL_image.h>
-#include "Window.hpp"
+#include "Engine.hpp"
 
-#define INIT_WIN_W 640
-#define INIT_WIN_H 480
 
 using std::string;
 
@@ -36,7 +34,7 @@ int main(int argc, char *argv[])
 	if (std::string::npos != last_slash_idx)
 		fname.erase(0, last_slash_idx + 1);
 
-        Window win(fname.c_str(), argv[1]);
+        Engine win(fname.c_str(), argv[1]);
 
         win.fit_window();
 
