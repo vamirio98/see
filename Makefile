@@ -1,4 +1,4 @@
-SRC = main.cpp Engine.cpp
+SRC = main.cpp Engine.cpp Logger.cpp
 CC = g++
 COMPILER_FLAGS = -Wall
 LINKER_FLAGS = -lSDL2 -lSDL2_image
