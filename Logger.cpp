@@ -7,13 +7,14 @@
 
 #include "Logger.hpp"
 
+
 Logger::Logger()
 {
 }
 
 Logger::~Logger()
 {
-        this->quit();
+        this->free();
 }
 
 void Logger::init(const string &fname)
@@ -24,10 +25,15 @@ void Logger::init(const string &fname)
         lock = true;
 }
 
-void Logger::quit()
+void Logger::free()
 {
         fclose(log);
         lock = false;
+}
+
+void Logger::msg(const string &message)
+{
+        fprintf(log, "%s\n", message.c_str());
 }
 
 void Logger::error()

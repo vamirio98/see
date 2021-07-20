@@ -21,7 +21,8 @@ public:
         Logger();
         ~Logger();
         void init(const string &fname);
-        void quit();
+        void free();
+        void msg(const string &message);
         void error();
         void error(const string &err);
         void warn(const string &warning);
