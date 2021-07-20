@@ -7,6 +7,7 @@
 
 #include "Logger.hpp"
 
+using std::string;
 
 Logger::Logger()
 {

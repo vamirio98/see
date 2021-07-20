@@ -11,8 +11,6 @@
 #include <string>
 #include <cstdio>
 
-using std::string;
-
 class Logger {
 private:
         static FILE *log;
@@ -20,10 +18,10 @@ private:
 public:
         Logger();
         ~Logger();
-        void init(const string &fname);
+        void init(const std::string &fname);
         void free();
-        void msg(const string &message);
+        void msg(const std::string &message);
         void error();
-        void error(const string &err);
-        void warn(const string &warning);
+        void error(const std::string &err);
+        void warn(const std::string &warning);
 };

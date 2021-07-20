@@ -7,6 +7,8 @@
 
 #include "Engine.hpp"
 
+using std::string;
+
 Engine::Engine(string title, string fname)
 {
         this->title = title;

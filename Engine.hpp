@@ -15,7 +15,6 @@
 #include <string>
 #include "Logger.hpp"
 
-using std::string;
 using See_window = SDL_Window;
 using See_renderer = SDL_Renderer;
 using See_texture = SDL_Texture;
@@ -28,7 +27,7 @@ struct See_content {
 
 class Engine {
 private:
-        string title{""};
+        std::string title{""};
         int w{640};
         int h{480};
         See_window *win;
@@ -36,7 +35,7 @@ private:
         See_content content;
 
 public:
-        Engine(string title, string fname);
+        Engine(std::string title, std::string fname);
         ~Engine();
         void display();
         void fit_window();
