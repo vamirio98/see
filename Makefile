@@ -1,4 +1,4 @@
-SRC = main.cpp Engine.cpp Logger.cpp
+SRC = main.cpp Engine.cpp Logger.cpp File.cpp
 CC = g++
 COMPILER_FLAGS = -Wall
 DEBUG_FLAGS = -g

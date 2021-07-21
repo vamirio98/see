@@ -2,7 +2,7 @@
  * main.cpp -
  *
  * Created by Haoyuan Li on 2021/07/14
- * Last Modified: 2021/07/14 23:41:54
+ * Last Modified: 2021/07/22 00:08:53
  */
 
 #include <string>
@@ -11,6 +11,7 @@
 #include <SDL2/SDL_video.h>
 #include <SDL2/SDL_image.h>
 #include "Engine.hpp"
+#include "File.hpp"
 
 using std::string;
 
@@ -27,14 +28,12 @@ int main(int argc, char *argv[])
         auto engnie = Engine::get_instance();
         engnie->init();
 
-	string fname{argv[1]};
-	// remove directory if present
-	const auto last_slash_idx = fname.find_last_of("\\/");
-	if (std::string::npos != last_slash_idx)
-		fname.erase(0, last_slash_idx + 1);
-        engnie->set_window_title(fname);
-        engnie->load_texture(string{argv[1]});
+        File file;
+        file.open(argv[1], "r");
+        engnie->set_window_title(file.get_filename_without_path());
+        engnie->load_texture(file.get_full_filename());
         engnie->fit_window();
+        file.close();
 
         bool run = true;
 	while (run) {
