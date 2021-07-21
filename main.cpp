@@ -12,7 +12,6 @@
 #include <SDL2/SDL_image.h>
 #include "Engine.hpp"
 
-
 using std::string;
 
 int init();
@@ -24,19 +23,18 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "%s\n", "Usage: see <filename>");
 		return 1;
 	}
-	if (init() != 0)
-		return 1;
 
+        auto engnie = Engine::get_instance();
+        engnie->init();
 
 	string fname{argv[1]};
 	// remove directory if present
 	const auto last_slash_idx = fname.find_last_of("\\/");
 	if (std::string::npos != last_slash_idx)
 		fname.erase(0, last_slash_idx + 1);
-
-        Engine win(fname.c_str(), argv[1]);
-
-        win.fit_window();
+        engnie->set_window_title(fname);
+        engnie->load_texture(string{argv[1]});
+        engnie->fit_window();
 
         bool run = true;
 	while (run) {
@@ -53,36 +51,15 @@ int main(int argc, char *argv[])
                         case SDL_WINDOWEVENT:
                                 switch (e.window.event) {
                                 case SDL_WINDOWEVENT_RESIZED:
-                                        win.fit_window();
+                                        engnie->fit_window();
                                 }
                         default:
                                 break;
                         }
 		}
-                win.display();
+                engnie->render_clear();
+                engnie->render_copy();
+                engnie->render_present();
 	}
-
-	quit();
-}
-
-
-/*
- * init - inintialize
- * returns 0 on success or the error code on failure
- */
-int init()
-{
-	int err = 0;
-	if ((errno = SDL_Init(SDL_INIT_AUDIO)) != 0)
-		SDL_Log("Unable to inintialize SDL: %s", SDL_GetError());
-	return err;
-}
-
-
-/*
- * quit
- */
-void quit()
-{
-	SDL_Quit();
+        engnie->free();
 }

@@ -9,21 +9,25 @@
 
 using std::string;
 
+FILE *Logger::log = nullptr;
+bool Logger::lock = false;
+
 Logger::Logger()
 {
 }
 
 Logger::~Logger()
 {
-        this->free();
+        free();
 }
 
-void Logger::init(const string &fname)
+FILE *Logger::init(const string &fname)
 {
         if (lock)
-                return;
+                return nullptr;
         log = fopen(fname.c_str(), "w");
         lock = true;
+        return log;
 }
 
 void Logger::free()
@@ -37,12 +41,12 @@ void Logger::msg(const string &message)
         fprintf(log, "%s\n", message.c_str());
 }
 
-void Logger::error()
+void Logger::error(const string &msg)
 {
-        fprintf(log, "Error: %s\n", SDL_GetError());
+        fprintf(log, "[Error] %s: %s\n", msg.c_str(), SDL_GetError());
 }
 
 void Logger::warn(const string &warning)
 {
-        fprintf(log, "Warn: %s", warning.c_str());
+        fprintf(log, "[Warn] %s", warning.c_str());
 }
