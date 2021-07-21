@@ -18,7 +18,6 @@ Engine::Engine()
 
 Engine::~Engine()
 {
-        free();
 }
 
 void Engine::init()
