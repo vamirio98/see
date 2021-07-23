@@ -4,7 +4,7 @@
  * contains basic file operations
  *
  * Created by Haoyuan Li on 2021/07/21
- * Last Modified: 2021/07/23 22:03:31
+ * Last Modified: 2021/07/23 23:52:46
  */
 
 #include "File.hpp"
@@ -107,10 +107,13 @@ void File::move_to_prev_file()
         if (file_list.empty())
                 return;
         auto current = index;
-        while (index != 0 && get_type(file_list[index]) != IS_REG_FILE)
+        index = (index == 0) ? index : index - 1;
+        // skip other files
+        while (index != 0 && get_type(path + "/" + file_list[index])
+                        != IS_REG_FILE)
                 ++index;
-        if (get_type(file_list[index]) == IS_REG_FILE)
-                open_file(file_list[index], "r");
+        if (get_type(path + "/" + file_list[index]) == IS_REG_FILE)
+                open_file(path + "/" + file_list[index], "r");
         else
                 index = current;
 }
@@ -134,11 +137,13 @@ void File::move_to_next_file()
         if (file_list.empty())
                 return;
         auto current = index;
-        while (index != file_list.size() -1 && get_type(file_list[index])
-                        != IS_REG_FILE)
+        index = (index == file_list.size() - 1) ? index : index + 1;
+        // skip other files
+        while (index != file_list.size() -1 && get_type(
+                                path + "/" + file_list[index]) != IS_REG_FILE)
                 ++index;
-        if (get_type(file_list[index]) == IS_REG_FILE)
-                open_file(file_list[index], "r");
+        if (get_type(path + "/" + file_list[index]) == IS_REG_FILE)
+                open_file(path + "/" + file_list[index], "r");
         else
                 index = current;
 }
@@ -155,13 +160,13 @@ int File::open(const string &filename)
 {
         if (filename.empty())
                 return -1;
-        int type = get_type(filename);
+        int type = get_type(path + "/" + filename);
         if (type == IS_REG_FILE) {
                 open_file(filename, "r");
                 open_dir(get_path(filename));
                 get_file_list();
                 index = std::find(file_list.begin(), file_list.end(),
-                                filename) - file_list.begin();
+                                this->filename) - file_list.begin();
         } else if (type == IS_DIR) {
                 open_dir(filename);
                 get_file_list();
@@ -171,17 +176,17 @@ int File::open(const string &filename)
                                 fp = nullptr;
                                 break;
                         }
-                        // skip directories
+                        // skip other files
                         while (index != file_list.size() &&
-                                        get_type(file_list[index]) !=
-                                        IS_REG_FILE)
+                                        get_type(path + "/" + file_list[index])
+                                        != IS_REG_FILE)
                                 ++index;
                         if (index == file_list.size()) {
                                 this->filename = "";
                                 fp = nullptr;
                                 index = 0;
                         } else {
-                                open_file(file_list[index], "r");
+                                open_file(path + "/" + file_list[index], "r");
                         }
                 } while (0);
         } else {
@@ -225,7 +230,7 @@ int File::open(const string &filename, const string &mode)
         }
         get_file_list();
         index = std::find(file_list.begin(), file_list.end(),
-                        filename) - file_list.begin();
+                        this->filename) - file_list.begin();
         return 0;
 }
 
