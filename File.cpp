@@ -4,7 +4,7 @@
  * contains basic file operations
  *
  * Created by Haoyuan Li on 2021/07/21
- * Last Modified: 2021/07/23 20:38:42
+ * Last Modified: 2021/07/23 22:03:31
  */
 
 #include "File.hpp"
@@ -106,8 +106,13 @@ void File::move_to_prev_file()
 {
         if (file_list.empty())
                 return;
-        index = (index == 0) ? index : index - 1;
-        open_file(file_list[index], "r");
+        auto current = index;
+        while (index != 0 && get_type(file_list[index]) != IS_REG_FILE)
+                ++index;
+        if (get_type(file_list[index]) == IS_REG_FILE)
+                open_file(file_list[index], "r");
+        else
+                index = current;
 }
 
 /**
@@ -128,8 +133,14 @@ void File::move_to_next_file()
 {
         if (file_list.empty())
                 return;
-        index = (index == file_list.size() - 1 ? index : index + 1);
-        open_file(file_list[index], "r");
+        auto current = index;
+        while (index != file_list.size() -1 && get_type(file_list[index])
+                        != IS_REG_FILE)
+                ++index;
+        if (get_type(file_list[index]) == IS_REG_FILE)
+                open_file(file_list[index], "r");
+        else
+                index = current;
 }
 
 /**
@@ -154,12 +165,25 @@ int File::open(const string &filename)
         } else if (type == IS_DIR) {
                 open_dir(filename);
                 get_file_list();
-                if (!file_list.empty()) {
-                        open_file(file_list[0], "r");
-                } else {
-                        this->filename = "";
-                        fp = nullptr;
-                }
+                do {
+                        if (file_list.empty()) {
+                                this->filename = "";
+                                fp = nullptr;
+                                break;
+                        }
+                        // skip directories
+                        while (index != file_list.size() &&
+                                        get_type(file_list[index]) !=
+                                        IS_REG_FILE)
+                                ++index;
+                        if (index == file_list.size()) {
+                                this->filename = "";
+                                fp = nullptr;
+                                index = 0;
+                        } else {
+                                open_file(file_list[index], "r");
+                        }
+                } while (0);
         } else {
                 fprintf(stderr, "[error] unknown type: %s\n",
                                 filename.c_str());
@@ -175,9 +199,11 @@ int File::open(const string &filename)
 void File::close()
 {
         filename.clear();
-        fclose(fp);
+        if (fp)
+                fclose(fp);
         path.clear();
-        closedir(dp);
+        if (dp)
+                closedir(dp);
         file_list.clear();
         index = 0;
 }
