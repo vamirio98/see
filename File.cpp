@@ -4,7 +4,7 @@
  * contains basic file operations
  *
  * Created by Haoyuan Li on 2021/07/21
- * Last Modified: 2021/07/23 19:58:29
+ * Last Modified: 2021/07/23 20:33:24
  */
 
 #include "File.hpp"
@@ -60,6 +60,8 @@ int File::open_dir(const string &dirname)
  */
 bool File::exists(const string &filename)
 {
+        if (filename.empty())
+                return false;
         struct stat st;
         return !(stat(filename.c_str(), &st));
 }
@@ -70,6 +72,8 @@ bool File::exists(const string &filename)
  */
 string::size_type File::find_last_delimiter(const string &filename)
 {
+        if (filename.empty())
+                return std::string::npos;
         return filename.find_last_of("/\\");
 }
 
@@ -81,6 +85,8 @@ string::size_type File::find_last_delimiter(const string &filename)
  */
 int File::get_type(const string &filename)
 {
+        if (filename.empty())
+                return UNKNOWN;
         struct stat st;
         int type;
         lstat(filename.c_str(), &st);
@@ -98,6 +104,8 @@ int File::get_type(const string &filename)
  */
 void File::move_to_prev_file()
 {
+        if (file_list.empty())
+                return;
         index = (index == 0) ? index : index - 1;
         open_file(file_list[index], "r");
 }
@@ -108,6 +116,8 @@ void File::move_to_prev_file()
  */
 string File::get_curr_file()
 {
+        if (file_list.empty())
+                return "";
         return file_list[index];
 }
 
@@ -116,6 +126,8 @@ string File::get_curr_file()
  */
 void File::move_to_next_file()
 {
+        if (file_list.empty())
+                return;
         index = (index == file_list.size() - 1 ? index : index + 1);
         open_file(file_list[index], "r");
 }
@@ -130,15 +142,24 @@ void File::move_to_next_file()
  */
 int File::open(const string &filename)
 {
+        if (filename.empty())
+                return -1;
         int type = get_type(filename);
         if (type == IS_REG_FILE) {
                 open_file(filename, "r");
                 open_dir(get_path(filename));
                 get_file_list();
+                index = std::find(file_list.begin(), file_list.end(),
+                                filename) - file_list.begin();
         } else if (type == IS_DIR) {
                 open_dir(filename);
                 get_file_list();
-                open_file(file_list[0], "r");
+                if (!file_list.empty()) {
+                        open_file(file_list[0], "r");
+                } else {
+                        this->filename = "";
+                        fp = nullptr;
+                }
         } else {
                 fprintf(stderr, "[error] unknown type: %s\n",
                                 filename.c_str());
@@ -177,6 +198,8 @@ int File::open(const string &filename, const string &mode)
                 return -1;
         }
         get_file_list();
+        index = std::find(file_list.begin(), file_list.end(),
+                        filename) - file_list.begin();
         return 0;
 }
 
@@ -185,6 +208,8 @@ int File::open(const string &filename, const string &mode)
  */
 string File::get_full_filename()
 {
+        if (filename.empty())
+                return "";
         return path + "/" + filename;
 }
 
@@ -194,6 +219,8 @@ string File::get_full_filename()
  */
 string File::get_ext()
 {
+        if (filename.empty())
+                return "";
         string ext{filename};
         auto pos = ext.find_last_of('.');
         if (pos != std::string::npos)
@@ -217,6 +244,8 @@ string File::get_filename_without_path()
  */
 string File::get_filename_without_path(const string &filename)
 {
+        if (filename.empty())
+                return "";
         auto pos = find_last_delimiter(filename);
         if (pos != std::string::npos)
                 return filename.substr(pos + 1);
@@ -239,6 +268,8 @@ string File::get_path()
  */
 string File::get_path(const string &filename)
 {
+        if (filename.empty())
+                return ".";
         auto pos = find_last_delimiter(filename);
         if (pos != std::string::npos)
                 return filename.substr(0, pos);
@@ -274,5 +305,5 @@ void File::cd(const std::string &dirname)
                 return;
         }
         close();
-        open(dirname);
+        open(".");
 }
