@@ -4,7 +4,7 @@
  * contains basic file operations
  *
  * Created by Haoyuan Li on 2021/07/21
- * Last Modified: 2021/07/23 20:33:24
+ * Last Modified: 2021/07/23 20:38:42
  */
 
 #include "File.hpp"
@@ -286,7 +286,8 @@ strvec File::get_file_list()
         struct dirent *p;
 
         while ((p = readdir(tmp))) {
-                if (string{"."} == p->d_name || string{".."} == p->d_name)
+                // ignore the hidden files
+                if ('.' == p->d_name[0])
                         continue;
                 file_list.push_back(p->d_name);
         }
