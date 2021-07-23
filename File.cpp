@@ -4,7 +4,7 @@
  * contains basic file operations
  *
  * Created by Haoyuan Li on 2021/07/21
- * Last Modified: 2021/07/23 19:45:36
+ * Last Modified: 2021/07/23 19:56:47
  */
 
 #include "File.hpp"
@@ -154,8 +154,12 @@ int File::open(const string &filename)
  */
 void File::close()
 {
+        filename.clear();
         fclose(fp);
+        path.clear();
         closedir(dp);
+        file_list.clear();
+        index = 0;
 }
 
 /**
