@@ -4,7 +4,7 @@
  * contains basic file operations
  *
  * Created by Haoyuan Li on 2021/07/21
- * Last Modified: 2021/07/23 19:56:47
+ * Last Modified: 2021/07/23 19:58:29
  */
 
 #include "File.hpp"
@@ -50,7 +50,6 @@ int File::open_dir(const string &dirname)
                 return -1;
         }
         path = dirname;
-        index = 0;
         return 0;
 }
 
