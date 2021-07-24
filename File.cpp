@@ -4,7 +4,7 @@
  * contains basic file operations
  *
  * Created by Haoyuan Li on 2021/07/21
- * Last Modified: 2021/07/24 23:14:20
+ * Last Modified: 2021/07/24 23:54:28
  */
 
 #include "File.hpp"
@@ -36,25 +36,7 @@ int File::open_file(const string &filename, const string &mode)
 }
 
 /**
- * \brief Open a directory
- * \param dirname The directory name
- * \return 0 when secceeded and -1 when failed
- * \sa open()
- * \sa close()
- */
-int File::open_dir(const string &dirname)
-{
-        if (!opendir(dirname.c_str())) {
-                fprintf(stderr, "[error] couldn't open directory %s\n",
-                                dirname.c_str());
-                return -1;
-        }
-        path = dirname;
-        return 0;
-}
-
-/**
- * \brief Check if the file exists
+ * \brief Check if the file or directory exists
  * \param filename The filename
  * \return true when the file exists and false when not
  */
@@ -108,21 +90,24 @@ void File::move_to_prev_file()
                 return;
         auto current = index;
         index = (index == 0) ? index : index - 1;
-        // skip other files
-        while (index != 0 && get_type(path + "/" + file_list[index])
+        // skip files that are not regular files
+        while (index != 0 && get_type(dir + "/" + file_list[index])
                         != IS_REG_FILE)
                 ++index;
-        if (get_type(path + "/" + file_list[index]) == IS_REG_FILE)
-                open_file(path + "/" + file_list[index], "r");
-        else
+        if (get_type(dir + "/" + file_list[index]) == IS_REG_FILE) {
+                fclose(fp);
+                open_file(dir + "/" + file_list[index], "r");
+        }
+        else {
                 index = current;
+        }
 }
 
 /**
  * \brief Get the current filename
  * \return The current filename
  */
-string File::get_curr_file()
+string File::get_curr_filename()
 {
         if (file_list.empty())
                 return "";
@@ -138,14 +123,17 @@ void File::move_to_next_file()
                 return;
         auto current = index;
         index = (index == file_list.size() - 1) ? index : index + 1;
-        // skip other files
+        // skip files that are not regular files
         while (index != file_list.size() -1 && get_type(
-                                path + "/" + file_list[index]) != IS_REG_FILE)
+                                dir + "/" + file_list[index]) != IS_REG_FILE)
                 ++index;
-        if (get_type(path + "/" + file_list[index]) == IS_REG_FILE)
-                open_file(path + "/" + file_list[index], "r");
-        else
+        if (get_type(dir + "/" + file_list[index]) == IS_REG_FILE) {
+                fclose(fp);
+                open_file(dir + "/" + file_list[index], "r");
+        }
+        else {
                 index = current;
+        }
 }
 
 /**
@@ -158,17 +146,18 @@ void File::move_to_next_file()
  */
 int File::open(const string &filename)
 {
-        if (filename.empty())
+        if (filename.empty() || !exists(filename))
                 return -1;
-        int type = get_type(path + "/" + filename);
+        int type = get_type(filename);
         if (type == IS_REG_FILE) {
                 open_file(filename, "r");
-                open_dir(get_path(filename));
+                dir = get_path(filename);
                 get_file_list();
                 index = std::find(file_list.begin(), file_list.end(),
                                 this->filename) - file_list.begin();
         } else if (type == IS_DIR) {
-                open_dir(filename);
+                dir = filename;
+                index = 0;
                 get_file_list();
                 do {
                         if (file_list.empty()) {
@@ -176,9 +165,9 @@ int File::open(const string &filename)
                                 fp = nullptr;
                                 break;
                         }
-                        // skip other files
+                        // skip files that are not regular files
                         while (index != file_list.size() &&
-                                        get_type(path + "/" + file_list[index])
+                                        get_type(dir + "/" + file_list[index])
                                         != IS_REG_FILE)
                                 ++index;
                         if (index == file_list.size()) {
@@ -186,7 +175,7 @@ int File::open(const string &filename)
                                 fp = nullptr;
                                 index = 0;
                         } else {
-                                open_file(path + "/" + file_list[index], "r");
+                                open_file(dir + "/" + file_list[index], "r");
                         }
                 } while (0);
         } else {
@@ -206,7 +195,7 @@ void File::close()
         filename.clear();
         if (fp)
                 fclose(fp);
-        path.clear();
+        dir.clear();
         file_list.clear();
         index = 0;
 }
@@ -221,11 +210,11 @@ void File::close()
  */
 int File::open(const string &filename, const string &mode)
 {
-        if(open_file(filename, mode) || open_dir(get_path(filename))) {
-                fprintf(stderr, "[error] couldn't open %s\n",
-                                filename.c_str());
+        if (filename.empty() || !exists(filename))
                 return -1;
-        }
+        if(open_file(filename, mode))
+                return -1;
+        dir = get_path(filename);
         get_file_list();
         index = std::find(file_list.begin(), file_list.end(),
                         this->filename) - file_list.begin();
@@ -239,7 +228,7 @@ string File::get_full_filename()
 {
         if (filename.empty())
                 return "";
-        return path + "/" + filename;
+        return dir + "/" + filename;
 }
 
 /**
@@ -287,7 +276,7 @@ string File::get_filename_without_path(const string &filename)
  */
 string File::get_path()
 {
-        return path;
+        return dir;
 }
 
 /**
@@ -311,7 +300,7 @@ string File::get_path(const string &filename)
  */
 strvec File::get_file_list()
 {
-        DIR *dp = opendir(path.c_str());
+        DIR *dp = opendir(dir.c_str());
         struct dirent *p;
 
         while ((p = readdir(dp))) {

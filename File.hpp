@@ -4,7 +4,7 @@
  * contains basic file operations
  *
  * Created by Haoyuan Li on 2021/07/21
- * Last Modified: 2021/07/24 23:13:22
+ * Last Modified: 2021/07/24 23:36:35
  */
 
 #ifndef FILE_HPP
@@ -29,13 +29,12 @@ private:
         FILE *fp;       // point to the current file
 
         // use for directory
-        std::string path;       // the current path
+        std::string dir;       // the current directory
         std::vector<std::string> file_list;
         size_t index;   // the current file index
 
 private:
         int open_file(const std::string &filename, const std::string &mode);
-        int open_dir(const std::string &dirname);
 
 public:
         File();
@@ -49,7 +48,7 @@ public:
         std::string::size_type find_last_delimiter(const std::string &filename);
         int get_type(const std::string &filename);
         void move_to_prev_file();
-        std::string get_curr_file();
+        std::string get_curr_filename();
         void move_to_next_file();
         int open(const std::string &filename);
         void close();

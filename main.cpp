@@ -2,7 +2,7 @@
  * main.cpp -
  *
  * Created by Haoyuan Li on 2021/07/14
- * Last Modified: 2021/07/23 23:59:11
+ * Last Modified: 2021/07/24 23:57:39
  */
 
 #include <string>
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
                                 if (e.key.keysym.sym == SDLK_RIGHT)
                                         file.move_to_next_file();
                                 engnie->load_texture(file.get_full_filename());
-                                engnie->set_window_title(file.get_curr_file());
+                                engnie->set_window_title(file.get_curr_filename());
                                 engnie->fit_window();
                                 break;
                         case SDL_WINDOWEVENT:
