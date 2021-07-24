@@ -2,7 +2,7 @@
  * Logger.cpp - the Logger class
  *
  * Created by Haoyuan Li on 2021/07/20
- * Last Modified: 2021/07/20 22:22:14
+ * Last Modified: 2021/07/24 18:33:36
  */
 
 #include "Logger.hpp"
@@ -44,7 +44,7 @@ void Logger::get_current_time()
         tp = localtime(&t);
         char str[30];
         sprintf(str, "%d-%02d-%02d %02d:%02d:%02d",
-                        tp->tm_yday + 1900, tp->tm_mon + 1, tp->tm_mday,
+                        tp->tm_year + 1900, tp->tm_mon + 1, tp->tm_mday,
                         tp->tm_hour, tp->tm_min, tp->tm_sec);
         tstr = str;
 }
