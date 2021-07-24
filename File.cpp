@@ -4,7 +4,7 @@
  * contains basic file operations
  *
  * Created by Haoyuan Li on 2021/07/21
- * Last Modified: 2021/07/23 23:52:46
+ * Last Modified: 2021/07/24 23:14:20
  */
 
 #include "File.hpp"
@@ -36,7 +36,7 @@ int File::open_file(const string &filename, const string &mode)
 }
 
 /**
- * \brief Open a directory, then get all files in it
+ * \brief Open a directory
  * \param dirname The directory name
  * \return 0 when secceeded and -1 when failed
  * \sa open()
@@ -44,7 +44,7 @@ int File::open_file(const string &filename, const string &mode)
  */
 int File::open_dir(const string &dirname)
 {
-        if (!(dp = opendir(dirname.c_str()))) {
+        if (!opendir(dirname.c_str())) {
                 fprintf(stderr, "[error] couldn't open directory %s\n",
                                 dirname.c_str());
                 return -1;
@@ -207,8 +207,6 @@ void File::close()
         if (fp)
                 fclose(fp);
         path.clear();
-        if (dp)
-                closedir(dp);
         file_list.clear();
         index = 0;
 }
@@ -313,10 +311,10 @@ string File::get_path(const string &filename)
  */
 strvec File::get_file_list()
 {
-        DIR *tmp = dp;
+        DIR *dp = opendir(path.c_str());
         struct dirent *p;
 
-        while ((p = readdir(tmp))) {
+        while ((p = readdir(dp))) {
                 // ignore the hidden files
                 if ('.' == p->d_name[0])
                         continue;

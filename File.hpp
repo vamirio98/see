@@ -4,7 +4,7 @@
  * contains basic file operations
  *
  * Created by Haoyuan Li on 2021/07/21
- * Last Modified: 2021/07/23 19:44:50
+ * Last Modified: 2021/07/24 23:13:22
  */
 
 #ifndef FILE_HPP
@@ -30,7 +30,6 @@ private:
 
         // use for directory
         std::string path;       // the current path
-        DIR *dp;        // point to the current directory
         std::vector<std::string> file_list;
         size_t index;   // the current file index
 
