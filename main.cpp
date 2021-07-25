@@ -2,7 +2,7 @@
  * main.cpp -
  *
  * Created by Haoyuan Li on 2021/07/14
- * Last Modified: 2021/07/24 23:57:39
+ * Last Modified: 2021/07/25 14:12:09
  */
 
 #include <string>
@@ -15,16 +15,14 @@
 
 using std::string;
 
-int init();
-void quit();
-
 int main(int argc, char *argv[])
 {
-	if (argc != 2) {
+	/*if (argc != 2) {
 		fprintf(stderr, "%s\n", "Usage: see <filename>");
 		return 1;
-	}
+	}*/
 
+    IMG_Init(IMG_INIT_JPG);
         auto engnie = Engine::get_instance();
         engnie->init();
 
@@ -71,4 +69,5 @@ int main(int argc, char *argv[])
 	}
         file.close();
         engnie->free();
+        return 0;
 }

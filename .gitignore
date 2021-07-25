@@ -42,3 +42,7 @@ see
 
 # build dir
 build/
+
+# on Windows
+.vs
+CMakeSettings.json

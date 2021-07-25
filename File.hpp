@@ -4,7 +4,7 @@
  * contains basic file operations
  *
  * Created by Haoyuan Li on 2021/07/21
- * Last Modified: 2021/07/24 23:36:35
+ * Last Modified: 2021/07/25 10:28:47
  */
 
 #ifndef FILE_HPP
@@ -14,9 +14,17 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include <dirent.h>
 #include <sys/stat.h>
-#include <unistd.h>
+
+#ifdef unix
+        #include <unistd.h>
+        #include <dirent.h>
+#endif // unix
+
+#ifdef _WIN32
+        #include <Windows.h>
+        #include <direct.h>
+#endif // _WIN32
 
 #define IS_REG_FILE 0
 #define IS_DIR 1

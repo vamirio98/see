@@ -4,13 +4,20 @@
  * contains basic file operations
  *
  * Created by Haoyuan Li on 2021/07/21
- * Last Modified: 2021/07/24 23:54:28
+ * Last Modified: 2021/07/25 10:29:00
  */
 
 #include "File.hpp"
 
 using string = std::string;
 using strvec = std::vector<std::string>;
+
+#ifdef unix
+        const string delim = "/";
+#else
+        const string delim = "\\";
+#endif
+
 
 File::File()
 {
@@ -69,8 +76,10 @@ int File::get_type(const string &filename)
 {
         if (filename.empty())
                 return UNKNOWN;
-        struct stat st;
         int type;
+
+#ifdef unix
+        struct stat st;
         lstat(filename.c_str(), &st);
         if (S_ISREG(st.st_mode))
                 type = IS_REG_FILE;
@@ -78,6 +87,19 @@ int File::get_type(const string &filename)
                 type = IS_DIR;
         else
                 type = UNKNOWN;
+#endif // unix
+
+#ifdef _WIN32
+        DWORD attr = GetFileAttributes(filename.c_str());
+        if (attr == FILE_ATTRIBUTE_DIRECTORY)
+                type = IS_DIR;
+        else if (attr == FILE_ATTRIBUTE_COMPRESSED || FILE_ATTRIBUTE_NORMAL ||
+                        attr == FILE_ATTRIBUTE_READONLY)
+                type = IS_REG_FILE;
+        else
+                type = UNKNOWN;
+#endif // _WIN32
+
         return type;
 }
 
@@ -91,12 +113,12 @@ void File::move_to_prev_file()
         auto current = index;
         index = (index == 0) ? index : index - 1;
         // skip files that are not regular files
-        while (index != 0 && get_type(dir + "/" + file_list[index])
+        while (index != 0 && get_type(dir + delim + file_list[index])
                         != IS_REG_FILE)
                 ++index;
-        if (get_type(dir + "/" + file_list[index]) == IS_REG_FILE) {
+        if (get_type(dir + delim + file_list[index]) == IS_REG_FILE) {
                 fclose(fp);
-                open_file(dir + "/" + file_list[index], "r");
+                open_file(dir + delim + file_list[index], "r");
         }
         else {
                 index = current;
@@ -125,11 +147,11 @@ void File::move_to_next_file()
         index = (index == file_list.size() - 1) ? index : index + 1;
         // skip files that are not regular files
         while (index != file_list.size() -1 && get_type(
-                                dir + "/" + file_list[index]) != IS_REG_FILE)
+                                dir + delim + file_list[index]) != IS_REG_FILE)
                 ++index;
-        if (get_type(dir + "/" + file_list[index]) == IS_REG_FILE) {
+        if (get_type(dir + delim + file_list[index]) == IS_REG_FILE) {
                 fclose(fp);
-                open_file(dir + "/" + file_list[index], "r");
+                open_file(dir + delim + file_list[index], "r");
         }
         else {
                 index = current;
@@ -167,7 +189,7 @@ int File::open(const string &filename)
                         }
                         // skip files that are not regular files
                         while (index != file_list.size() &&
-                                        get_type(dir + "/" + file_list[index])
+                                        get_type(dir + delim + file_list[index])
                                         != IS_REG_FILE)
                                 ++index;
                         if (index == file_list.size()) {
@@ -175,7 +197,7 @@ int File::open(const string &filename)
                                 fp = nullptr;
                                 index = 0;
                         } else {
-                                open_file(dir + "/" + file_list[index], "r");
+                                open_file(dir + delim + file_list[index], "r");
                         }
                 } while (0);
         } else {
@@ -228,7 +250,7 @@ string File::get_full_filename()
 {
         if (filename.empty())
                 return "";
-        return dir + "/" + filename;
+        return dir + delim + filename;
 }
 
 /**
@@ -300,8 +322,15 @@ string File::get_path(const string &filename)
  */
 strvec File::get_file_list()
 {
-        DIR *dp = opendir(dir.c_str());
+#ifdef unix
+        DIR *dp;
         struct dirent *p;
+
+        if (!(dp = opendir(dir.c_str()))) {
+                fprintf(stderr, "[error] couldn't get file list in %s\n",
+                                dir.c_str());
+                return file_list;
+        }
 
         while ((p = readdir(dp))) {
                 // ignore the hidden files
@@ -309,6 +338,35 @@ strvec File::get_file_list()
                         continue;
                 file_list.push_back(p->d_name);
         }
+
+        closedir(dp);
+#else
+        WIN32_FIND_DATA ffd;
+        HANDLE h_find = INVALID_HANDLE_VALUE;
+        DWORD error = 0;
+
+        h_find = FindFirstFile((dir + delim + "*").c_str(), &ffd);
+        if (h_find == INVALID_HANDLE_VALUE) {
+                fprintf(stderr, "[error] couldn't get file list in %s\n",
+                                dir.c_str());
+                return file_list;
+        }
+
+        do {
+                // ignore the hidden files
+                if (ffd.cFileName[0] == '.')
+                        continue;
+                file_list.push_back(ffd.cFileName);
+        } while (FindNextFile(h_find, &ffd));
+
+        error = GetLastError();
+        if (error != ERROR_NO_MORE_FILES)
+                fprintf(stderr, "[error] find first file error in %s\n",
+                                dir.c_str());
+
+        FindClose(h_find);
+#endif
+
         std::sort(file_list.begin(), file_list.end());
         return file_list;
 }
