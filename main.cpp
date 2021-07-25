@@ -2,7 +2,7 @@
  * main.cpp -
  *
  * Created by Haoyuan Li on 2021/07/14
- * Last Modified: 2021/07/25 23:19:22
+ * Last Modified: 2021/07/25 23:23:48
  */
 
 #include <string>
@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
         engnie->init();
 
         File file;
-        file.open(argv[1], "r");
+        file.open(argv[1]);
 
         engnie->set_window_title(file.get_filename_without_path());
         engnie->load_texture(file.get_full_filename());
