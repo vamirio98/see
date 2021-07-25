@@ -2,7 +2,7 @@
  * Engine.cpp - the Engine class
  *
  * Created by Haoyuan Li on 2021/07/17
- * Last Modified: 2021/07/21 23:36:54
+ * Last Modified: 2021/07/25 23:20:28
  */
 
 #include "Engine.hpp"
@@ -10,7 +10,7 @@
 using std::string;
 
 const string init_title{"See"};
-const string flog{"./log.log"};
+const string flog{"./see.log"};
 
 Engine::Engine()
 {
