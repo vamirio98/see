@@ -2,10 +2,12 @@
  * Engine.cpp - the Engine class
  *
  * Created by Haoyuan Li on 2021/07/17
- * Last Modified: 2021/07/25 23:20:28
+ * Last Modified: 2021/07/26 15:31:18
  */
 
 #include "Engine.hpp"
+#include <SDL2/SDL_video.h>
+#include <SDL2/SDL_image.h>
 
 using std::string;
 

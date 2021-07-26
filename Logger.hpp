@@ -4,16 +4,13 @@
  * depend on SDL2
  *
  * Created by Haoyuan Li on 2021/07/20
- * Last Modified: 2021/07/20 22:15:25
+ * Last Modified: 2021/07/26 15:30:43
  */
 
 #ifndef LOGGER_HPP
 #define LOGGER_HPP
 
-#include <SDL2/SDL.h>
 #include <string>
-#include <cstdio>
-#include <ctime>
 
 class Logger {
 private:

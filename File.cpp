@@ -4,10 +4,22 @@
  * contains basic file operations
  *
  * Created by Haoyuan Li on 2021/07/21
- * Last Modified: 2021/07/25 10:29:00
+ * Last Modified: 2021/07/26 15:23:58
  */
 
 #include "File.hpp"
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <sys/stat.h>
+
+#ifdef unix     // unix
+        #include <unistd.h>
+        #include <dirent.h>
+#else           // WINDOWS
+        #include <Windows.h>
+        #include <direct.h>
+#endif
 
 using string = std::string;
 using strvec = std::vector<std::string>;
@@ -23,14 +35,6 @@ File::File()
 {
 }
 
-/**
- * \brief Open a file by a specific mode
- * \param filename The filename
- * \param mode The specific mode, same as stdandard function fopen()
- * \return 0 when succeeded and -1 when failed
- * \sa open()
- * \sa close()
- */
 int File::open_file(const string &filename, const string &mode)
 {
         if (!(fp = fopen(filename.c_str(), mode.c_str()))) {
@@ -42,11 +46,6 @@ int File::open_file(const string &filename, const string &mode)
         return 0;
 }
 
-/**
- * \brief Check if the file or directory exists
- * \param filename The filename
- * \return true when the file exists and false when not
- */
 bool File::exists(const string &filename)
 {
         if (filename.empty())
@@ -55,10 +54,6 @@ bool File::exists(const string &filename)
         return !(stat(filename.c_str(), &st));
 }
 
-/**
- * \brief Get the last delimiter in the path
- * \return The index of the last delimiter, std::string::npos when not found
- */
 string::size_type File::find_last_delimiter(const string &filename)
 {
         if (filename.empty())
@@ -66,12 +61,6 @@ string::size_type File::find_last_delimiter(const string &filename)
         return filename.find_last_of("/\\");
 }
 
-/**
- * \brief Get the file type
- * \param filename The filename
- * \return IS_REG_FILE when it's a regular file, IS_DIR when it's a directory,
- * UNKNOWN when it can't be recognized
- */
 int File::get_type(const string &filename)
 {
         if (filename.empty())
@@ -103,9 +92,6 @@ int File::get_type(const string &filename)
         return type;
 }
 
-/**
- * \brief move to the previous file in the current directory
- */
 void File::move_to_prev_file()
 {
         if (file_list.empty())
@@ -125,10 +111,6 @@ void File::move_to_prev_file()
         }
 }
 
-/**
- * \brief Get the current filename
- * \return The current filename
- */
 string File::get_curr_filename()
 {
         if (file_list.empty())
@@ -136,9 +118,6 @@ string File::get_curr_filename()
         return file_list[index];
 }
 
-/**
- * \brief move to the next file in the current directory
- */
 void File::move_to_next_file()
 {
         if (file_list.empty())
@@ -158,14 +137,6 @@ void File::move_to_next_file()
         }
 }
 
-/**
- * \brief Open a file and the directory it locates
- * \param filename The filename
- * \return 0 when succeeded, -1 when failed
- * \sa open_file()
- * \sa open_dir()
- * \sa close()
- */
 int File::open(const string &filename)
 {
         if (filename.empty() || !exists(filename))
@@ -208,10 +179,6 @@ int File::open(const string &filename)
         return 0;
 }
 
-/**
- * \brief Close this file and directory
- * \sa open()
- */
 void File::close()
 {
         filename.clear();
@@ -222,14 +189,6 @@ void File::close()
         index = 0;
 }
 
-/**
- * \brief Open a file by a specific mode, then open the directory it locates
- * \param filename The filename
- * \param mode The specific mode, same as stdandard function fopen()
- * \return 0 when succeeded and -1 when failed
- * \sa open()
- * \sa close()
- */
 int File::open(const string &filename, const string &mode)
 {
         if (filename.empty() || !exists(filename))
@@ -243,9 +202,6 @@ int File::open(const string &filename, const string &mode)
         return 0;
 }
 
-/**
- * \brief get the full filename
- */
 string File::get_full_filename()
 {
         if (filename.empty())
@@ -253,10 +209,6 @@ string File::get_full_filename()
         return dir + delim + filename;
 }
 
-/**
- * \brief Get the file extension
- * \return the extension, "" if not found
- */
 string File::get_ext()
 {
         if (filename.empty())
@@ -268,20 +220,11 @@ string File::get_ext()
         return "";
 }
 
-/**
- * \brief Get filename without path
- * \return The filename without path
- */
 string File::get_filename_without_path()
 {
         return filename;
 }
 
-/**
- * \brief Get filename without path
- * \param filename The filename
- * \return The filename without path
- */
 string File::get_filename_without_path(const string &filename)
 {
         if (filename.empty())
@@ -292,20 +235,11 @@ string File::get_filename_without_path(const string &filename)
         return filename;
 }
 
-/**
- * \brief Get the current path
- * \return The path
- */
 string File::get_path()
 {
         return dir;
 }
 
-/**
- * \brief Get the current path
- * \param filename The filename
- * \return The path
- */
 string File::get_path(const string &filename)
 {
         if (filename.empty())
@@ -316,10 +250,6 @@ string File::get_path(const string &filename)
         return ".";
 }
 
-/**
- * \brief Get the file list in the current directory
- * \return The file list
- */
 strvec File::get_file_list()
 {
 #ifdef unix
@@ -371,10 +301,6 @@ strvec File::get_file_list()
         return file_list;
 }
 
-/**
- * \brief Change the current directory
- * \param dirname The destination directory
- */
 void File::cd(const std::string &dirname)
 {
         if (chdir(dirname.c_str())) {

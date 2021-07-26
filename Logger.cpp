@@ -2,10 +2,13 @@
  * Logger.cpp - the Logger class
  *
  * Created by Haoyuan Li on 2021/07/20
- * Last Modified: 2021/07/24 23:03:26
+ * Last Modified: 2021/07/26 15:30:41
  */
 
 #include "Logger.hpp"
+#include <SDL2/SDL.h>
+#include <cstdio>
+#include <ctime>
 
 using std::string;
 

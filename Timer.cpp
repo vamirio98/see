@@ -5,10 +5,11 @@
  * SDL_timer.h for more information
  *
  * Created by Haoyuan Li on 2021/07/26
- * Last Modified: 2021/07/26 10:40:03
+ * Last Modified: 2021/07/26 15:34:03
  */
 
 #include "Timer.hpp"
+#include <SDL2/SDL_timer.h>
 
 Timer::Timer()
 {
@@ -18,9 +19,6 @@ Timer::Timer()
         paused = false;
 }
 
-/**
- * \brief Start timing
- */
 void Timer::start()
 {
         started = true;
@@ -29,9 +27,6 @@ void Timer::start()
         pause_ms = 0;
 }
 
-/**
- * \brief Stop timing
- */
 void Timer::stop()
 {
         started = false;
@@ -40,9 +35,6 @@ void Timer::stop()
         pause_ms = 0;
 }
 
-/**
- * \brief Pause timing
- */
 void Timer::pause()
 {
         if (started && !paused) {
@@ -52,9 +44,6 @@ void Timer::pause()
         }
 }
 
-/**
- * \brief Resume timing
- */
 void Timer::resume()
 {
         if (started && paused) {
@@ -64,9 +53,6 @@ void Timer::resume()
         }
 }
 
-/**
- * \brief Get the timer running time
- */
 Uint32 Timer::get_ticks()
 {
         Uint32 time = 0;
@@ -79,17 +65,11 @@ Uint32 Timer::get_ticks()
         return time;
 }
 
-/**
- * \brief Check whether the timer is running
- */
 bool Timer::is_started()
 {
         return started;
 }
 
-/**
- * \brief Check whether the timer is paused
- */
 bool Timer::is_paused()
 {
         return started && paused;
