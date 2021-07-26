@@ -5,7 +5,7 @@
  * SDL_timer.h for more information
  *
  * Created by Haoyuan Li on 2021/07/26
- * Last Modified: 2021/07/26 10:25:45
+ * Last Modified: 2021/07/26 10:40:03
  */
 
 #include "Timer.hpp"
@@ -67,7 +67,7 @@ void Timer::resume()
 /**
  * \brief Get the timer running time
  */
-Uint32 Timer::get_run_time()
+Uint32 Timer::get_ticks()
 {
         Uint32 time = 0;
         if (started) {

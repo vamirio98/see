@@ -2,7 +2,7 @@
  * main.cpp -
  *
  * Created by Haoyuan Li on 2021/07/14
- * Last Modified: 2021/07/26 10:26:36
+ * Last Modified: 2021/07/26 11:49:44
  */
 
 #include <string>
@@ -12,8 +12,12 @@
 #include <SDL2/SDL_image.h>
 #include "Engine.hpp"
 #include "File.hpp"
+#include "Timer.hpp"
 
 using std::string;
+
+constexpr Uint32 fps = 25;
+constexpr Uint32 ticks_per_frame = 1000 / fps;
 
 int main(int argc, char *argv[])
 {
@@ -33,8 +37,10 @@ int main(int argc, char *argv[])
         engnie->fit_window();
 
         bool run = true;
+        SDL_Event e;
+        Timer cap_fps;
 	while (run) {
-		SDL_Event e;
+                cap_fps.start();
 		if (SDL_PollEvent(&e)) {
                         switch (e.type) {
                         case SDL_QUIT:
@@ -61,10 +67,13 @@ int main(int argc, char *argv[])
                         default:
                                 break;
                         }
+                        engnie->render_clear();
+                        engnie->render_copy();
+                        engnie->render_present();
 		}
-                engnie->render_clear();
-                engnie->render_copy();
-                engnie->render_present();
+                auto ticks = cap_fps.get_ticks();
+                if (ticks < ticks_per_frame)
+                        SDL_Delay(ticks_per_frame - ticks);
 	}
         file.close();
         engnie->free();

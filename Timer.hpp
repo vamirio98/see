@@ -5,7 +5,7 @@
  * SDL_timer.h for more information
  *
  * Created by Haoyuan Li on 2021/07/26
- * Last Modified: 2021/07/26 10:25:38
+ * Last Modified: 2021/07/26 10:39:46
  */
 
 #ifndef TIMER_HPP
@@ -23,7 +23,7 @@ public:
         void pause();
         void resume();
 
-        Uint32 get_run_time();
+        Uint32 get_ticks();
 
         // check the status of the timer
         bool is_started();
