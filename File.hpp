@@ -4,7 +4,7 @@
  * contains basic file operations
  *
  * Created by Haoyuan Li on 2021/07/21
- * Last Modified: 2021/07/26 15:27:35
+ * Last Modified: 2021/07/26 21:26:46
  */
 
 #ifndef FILE_HPP
@@ -17,6 +17,8 @@
 #define IS_REG_FILE 0
 #define IS_DIR 1
 #define UNKNOWN 2
+
+#define MSG_LEN 1024
 
 class File {
 public:
@@ -33,7 +35,7 @@ public:
          *
          * \return true when the file exists and false when not
          */
-        bool exists(const std::string &filename);
+        static bool exists(const std::string &filename);
 
         /**
          * \brief Get the last delimiter in the path
@@ -41,7 +43,8 @@ public:
          * \return The index of the last delimiter, std::string::npos when not
          * found
          */
-        std::string::size_type find_last_delimiter(const std::string &filename);
+        static std::string::size_type find_last_delimiter(
+                        const std::string &filename);
 
         /**
          * \brief Get the file type
@@ -51,7 +54,7 @@ public:
          * \return IS_REG_FILE when it's a regular file, IS_DIR when it's a
          * directory, UNKNOWN when it can't be recognized
          */
-        int get_type(const std::string &filename);
+        static int get_type(const std::string &filename);
 
         /**
          * \brief move to the previous file in the current directory
@@ -128,7 +131,8 @@ public:
          *
          * \return The filename without path
          */
-        std::string get_filename_without_path(const std::string &filename);
+        static std::string get_filename_without_path(
+                        const std::string &filename);
 
         /**
          * \brief Get the current path
@@ -144,7 +148,7 @@ public:
          *
          * \return The path
          */
-        std::string get_path(const std::string &filename);
+        static std::string get_path(const std::string &filename);
 
         /**
          * \brief Get the file list in the current directory
@@ -160,6 +164,13 @@ public:
          */
         void cd(const std::string &dirname);
 
+        /**
+         * \brief Get the error message
+         *
+         * \return The error message
+         */
+        char *get_error();
+
 private:
         std::string filename;   // the current filename
         FILE *fp;               // point to the current file
@@ -169,6 +180,8 @@ private:
         std::vector<std::string> file_list;
         size_t index;           // the current file index in the file_list
 
+        char error_msg[MSG_LEN];        // the error message
+
 private:
         /**
          * \brief Open a file by a specific mode
@@ -176,12 +189,20 @@ private:
          * \param filename The filename
          * \param mode The specific mode, same as stdandard function fopen()
          *
-         * \return 0 when succeeded and -1 when failed
+         * \return 0 when succeeded and -1 when failed, use get_error() to
+         * get the error message
          *
          * \sa open()
          * \sa close()
          */
         int open_file(const std::string &filename, const std::string &mode);
+
+        /**
+         * \brief Set the error message
+         *
+         * \param The message you want to set
+         */
+        void set_error(const char *const msg);
 };
 
 #endif

@@ -4,7 +4,7 @@
  * contains basic file operations
  *
  * Created by Haoyuan Li on 2021/07/21
- * Last Modified: 2021/07/26 15:23:58
+ * Last Modified: 2021/07/26 21:26:23
  */
 
 #include "File.hpp"
@@ -12,11 +12,12 @@
 #include <vector>
 #include <algorithm>
 #include <sys/stat.h>
+#include <cstring>
 
 #ifdef unix     // unix
         #include <unistd.h>
         #include <dirent.h>
-#else           // WINDOWS
+#else           // WIN32
         #include <Windows.h>
         #include <direct.h>
 #endif
@@ -38,8 +39,9 @@ File::File()
 int File::open_file(const string &filename, const string &mode)
 {
         if (!(fp = fopen(filename.c_str(), mode.c_str()))) {
-                fprintf(stderr, "[error] couldn't open file %s\n",
-                                filename.c_str());
+                char msg[MSG_LEN];
+                sprintf(msg, "couldn't open file %s", filename.c_str());
+                set_error(msg);
                 return -1;
         }
         this->filename = get_filename_without_path(filename);
@@ -87,7 +89,7 @@ int File::get_type(const string &filename)
                 type = IS_REG_FILE;
         else
                 type = UNKNOWN;
-#endif // _WIN32
+#endif // WIN32
 
         return type;
 }
@@ -104,7 +106,8 @@ void File::move_to_prev_file()
                 ++index;
         if (get_type(dir + delim + file_list[index]) == IS_REG_FILE) {
                 fclose(fp);
-                open_file(dir + delim + file_list[index], "r");
+                if (open_file(dir + delim + file_list[index], "r"))
+                        fprintf(stderr, "[error] %s\n", get_error());
         }
         else {
                 index = current;
@@ -130,7 +133,8 @@ void File::move_to_next_file()
                 ++index;
         if (get_type(dir + delim + file_list[index]) == IS_REG_FILE) {
                 fclose(fp);
-                open_file(dir + delim + file_list[index], "r");
+                if (open_file(dir + delim + file_list[index], "r"))
+                        fprintf(stderr, "[error] %s\n", get_error());
         }
         else {
                 index = current;
@@ -139,11 +143,16 @@ void File::move_to_next_file()
 
 int File::open(const string &filename)
 {
-        if (filename.empty() || !exists(filename))
+        if (filename.empty() || !exists(filename)) {
+                fprintf(stderr, "[error] no file '%s'\n", filename.c_str());
                 return -1;
+        }
         int type = get_type(filename);
         if (type == IS_REG_FILE) {
-                open_file(filename, "r");
+                if (open_file(filename, "r")) {
+                        fprintf(stderr, "[error] %s\n", get_error());
+                        return -1;
+                }
                 dir = get_path(filename);
                 get_file_list();
                 index = std::find(file_list.begin(), file_list.end(),
@@ -168,7 +177,12 @@ int File::open(const string &filename)
                                 fp = nullptr;
                                 index = 0;
                         } else {
-                                open_file(dir + delim + file_list[index], "r");
+                                if (open_file(dir + delim + file_list[index],
+                                                        "r")) {
+                                        fprintf(stderr, "[error] %s\n",
+                                                        get_error());
+                                        return -1;
+                                }
                         }
                 } while (0);
         } else {
@@ -191,10 +205,14 @@ void File::close()
 
 int File::open(const string &filename, const string &mode)
 {
-        if (filename.empty() || !exists(filename))
+        if (filename.empty() || !exists(filename)) {
+                fprintf(stderr, "[error] no file %s\n", filename.c_str());
                 return -1;
-        if(open_file(filename, mode))
+        }
+        if (open_file(filename, mode)) {
+                fprintf(stderr, "[error] %s\n", get_error());
                 return -1;
+        }
         dir = get_path(filename);
         get_file_list();
         index = std::find(file_list.begin(), file_list.end(),
@@ -248,6 +266,11 @@ string File::get_path(const string &filename)
         if (pos != std::string::npos)
                 return filename.substr(0, pos);
         return ".";
+}
+
+char *File::get_error()
+{
+        return error_msg;
 }
 
 strvec File::get_file_list()
@@ -309,4 +332,10 @@ void File::cd(const std::string &dirname)
         }
         close();
         open(".");
+}
+
+void File::set_error(const char *const msg)
+{
+        strncpy(error_msg, msg, MSG_LEN - 1);
+        error_msg[MSG_LEN - 1] = '\0';
 }
