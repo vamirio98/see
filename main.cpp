@@ -2,7 +2,7 @@
  * main.cpp -
  *
  * Created by Haoyuan Li on 2021/07/14
- * Last Modified: 2021/07/25 23:23:48
+ * Last Modified: 2021/07/26 10:26:36
  */
 
 #include <string>
@@ -22,7 +22,6 @@ int main(int argc, char *argv[])
 		return 1;
 	}*/
 
-    IMG_Init(IMG_INIT_JPG);
         auto engnie = Engine::get_instance();
         engnie->init();
 
