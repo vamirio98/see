@@ -2,10 +2,12 @@
  * main.cpp -
  *
  * Created by Haoyuan Li on 2021/07/14
- * Last Modified: 2021/07/26 11:49:44
+ * Last Modified: 2021/08/14 22:11:35
  */
 
+#include <vector>
 #include <string>
+#include <algorithm>
 #include <cstdio>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_video.h>
@@ -21,19 +23,25 @@ constexpr Uint32 ticks_per_frame = 1000 / fps;
 
 int main(int argc, char *argv[])
 {
-	/*if (argc != 2) {
+	if (argc != 2) {
 		fprintf(stderr, "%s\n", "Usage: see <filename>");
 		return 1;
-	}*/
+	}
 
         auto engnie = Engine::get_instance();
         engnie->init();
 
         File file;
-        file.open(argv[1]);
+        File dir;
+        file.bind(argv[1]);
+        dir.bind(file.get_parent() == "" ? "." : file.get_parent());
+        std::vector<string> filelist = dir.list();
+        std::sort(filelist.begin(), filelist.end());
+        decltype(filelist.size()) index = std::find(filelist.begin(),
+                        filelist.end(), file.get_name()) - filelist.begin();
 
-        engnie->set_window_title(file.get_filename_without_path());
-        engnie->load_texture(file.get_full_filename());
+        engnie->set_window_title(file.get_name());
+        engnie->load_texture(file.get_path());
         engnie->fit_window();
 
         bool run = true;
@@ -51,12 +59,19 @@ int main(int argc, char *argv[])
                                         run = false;
                                         break;
                                 }
-                                if (e.key.keysym.sym == SDLK_LEFT)
-                                        file.move_to_prev_file();
+                                if (e.key.keysym.sym == SDLK_LEFT) {
+                                        if (index != 0) {
+                                                file.unbind();
+                                                file.bind(dir.get_absolute_path() + file.separator + filelist[--index]);
+                                        }
+                                }
                                 if (e.key.keysym.sym == SDLK_RIGHT)
-                                        file.move_to_next_file();
-                                engnie->load_texture(file.get_full_filename());
-                                engnie->set_window_title(file.get_curr_filename());
+                                        if (index != filelist.size() - 1) {
+                                                file.unbind();
+                                                file.bind(dir.get_absolute_path() + file.separator + filelist[++index]);
+                                        }
+                                engnie->load_texture(file.get_absolute_path());
+                                engnie->set_window_title(file.get_name());
                                 engnie->fit_window();
                                 break;
                         case SDL_WINDOWEVENT:
@@ -75,7 +90,6 @@ int main(int argc, char *argv[])
                 if (ticks < ticks_per_frame)
                         SDL_Delay(ticks_per_frame - ticks);
 	}
-        file.close();
         engnie->free();
         return 0;
 }

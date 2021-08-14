@@ -1,208 +1,333 @@
 /**
- * File.hpp - the File class
+ * File.hpp - offer the basic multi-platform file operation
  *
- * contains basic file operations
- *
- * Created by Haoyuan Li on 2021/07/21
- * Last Modified: 2021/07/26 21:26:46
+ * Created by Haoyuan Li on 2021/08/11
+ * Last Modified: 2021/08/14 21:46:48
  */
 
 #ifndef FILE_HPP
 #define FILE_HPP
 
-#include <cstdio>
-#include <string>
 #include <vector>
-
-#define IS_REG_FILE 0
-#define IS_DIR 1
-#define UNKNOWN 2
-
-#define MSG_LEN 1024
+#include <string>
+#include <ctime>
 
 class File {
+private:
+        std::string pathname_{""}; // the file path
+
 public:
-        File();
-        ~File() = default;
+        static const std::string separator; // the path separator
+
+        /**
+         * @brief Get the last separator in the @pathname
+         *
+         * @param pathname The pathname
+         *
+         * @return The index of the last separator, std::string::npos if not
+         *         found
+         */
+        static std::string::size_type find_last_separator(
+                        const std::string &pathname);
+
+public:
+        File() = default;
         File(const File &) = delete;
         File &operator=(const File &) = delete;
-
-public:
-        /**
-         * \brief Check if the file or directory exists
-         *
-         * \param filename The filename
-         *
-         * \return true when the file exists and false when not
-         */
-        static bool exists(const std::string &filename);
+        ~File() = default;
 
         /**
-         * \brief Get the last delimiter in the path
+         * @brief Create a new File object by the given path
          *
-         * \return The index of the last delimiter, std::string::npos when not
-         * found
+         * @param pathname the specified path
          */
-        static std::string::size_type find_last_delimiter(
-                        const std::string &filename);
+        File(const std::string &pathname);
 
         /**
-         * \brief Get the file type
+         * @brief Create a new File object by the given parent path and
+         *        child path
          *
-         * \param filename The filename
-         *
-         * \return IS_REG_FILE when it's a regular file, IS_DIR when it's a
-         * directory, UNKNOWN when it can't be recognized
+         * @param parent The parent path
+         * @param child The child path
          */
-        static int get_type(const std::string &filename);
+        File(const std::string &parent, const std::string &child);
 
         /**
-         * \brief move to the previous file in the current directory
+         * @brief Bind the File object to an abstract path
+         *
+         * @param pathname The abstract path
+         *
+         * @sa unbind()
          */
-        void move_to_prev_file();
+        void bind(const std::string &pathname);
 
         /**
-         * \brief Get the current filename
+         * @brief Unbind the File object
          *
-         * \return The current filename
+         * @sa bind()
          */
-        std::string get_curr_filename();
+        void unbind();
 
         /**
-         * \brief move to the next file in the current directory
+         * @brief Check whether the file @pathname exists
+         *
+         * @param pathname The pathname
+         *
+         * @return True when the file exists, false when not
          */
-        void move_to_next_file();
+        static bool exists(const std::string &pathname);
 
         /**
-         * \brief Open a file and the directory it locates
+         * @brief Check whether the file or directory exists
          *
-         * \param filename The filename
-         *
-         * \return 0 when succeeded, -1 when failed
-         * \sa open_file()
-         * \sa open_dir()
-         * \sa close()
+         * @return True when the file or directory exists, false when not
          */
-        int open(const std::string &filename);
+        bool exists() const;
 
         /**
-         * \brief Close this file and directory
+         * @brief Check whether the file is a file
          *
-         * \sa open()
+         * @return True if it exists and it's a file, false otherwise
          */
-        void close();
+        bool is_file() const;
 
         /**
-         * \brief Open a file by a specific mode, then open the directory it locates
+         * @brief Check whether the file @pathname is a file
          *
-         * \param filename The filename
-         * \param mode The specific mode, same as stdandard function fopen()
+         * @param pathname The pathname
          *
-         * \return 0 when succeeded and -1 when failed
-         *
-         * \sa open()
-         * \sa close()
+         * @return True if it exists and it's a file, false otherwise
          */
-        int open(const std::string &filename, const std::string &mode);
+        static bool is_file(const std::string &pathname);
 
         /**
-         * \brief get the full filename
+         * @brief Check whether the file @pathname is a directory
+         *
+         * @param pathname The pathname
+         *
+         * @return True if it exists and it's a directory, false otherwise
          */
-        std::string get_full_filename();
+        static bool is_directory(const std::string &pathname);
 
         /**
-         * \brief Get the file extension
+         * @brief Check whether the file is a directory
          *
-         * \return the extension, "" if not found
+         * @return True if it exists and it's a directory, false otherwise
          */
-        std::string get_ext();
+        bool is_directory() const;
 
         /**
-         * \brief Get filename without path
+         * @brief Check whether the file @pathname is a hidden file
          *
-         * \return The filename without path
+         * @param pathname The pathname
+         *
+         * @return True if it's a hidden file, false otherwise
          */
-        std::string get_filename_without_path();
+        static bool is_hidden(const std::string &pathname);
 
         /**
-         * \brief Get filename without path
+         * @brief Check whether the file is a hidden file
          *
-         * \param filename The filename
-         *
-         * \return The filename without path
+         * @return True if it's a hidden file, false otherwise
          */
-        static std::string get_filename_without_path(
-                        const std::string &filename);
+        bool is_hidden() const;
 
         /**
-         * \brief Get the current path
+         * @brief Get the name of the file @pathname without the parent path
          *
-         * \return The path
+         * @param pathname The pathname
+         *
+         * @return The name of the file without the parent path
          */
-        std::string get_path();
+        static std::string get_name(const std::string &pathname);
 
         /**
-         * \brief Get the current path
+         * @brief Get the name of the file without the parent path
          *
-         * \param filename The filename
-         *
-         * \return The path
+         * @return The name of the file without the parent path
          */
-        static std::string get_path(const std::string &filename);
+        std::string get_name() const;
 
         /**
-         * \brief Get the file list in the current directory
+         * @brief Get the name of the parent path
          *
-         * \return The file list
+         * @param pathname The pathname
+         *
+         * @return The name of the parent path, "" if not found
          */
-        std::vector<std::string> get_file_list();
+        static std::string get_parent(const std::string &pathname);
 
         /**
-         * \brief Change the current directory
+         * @brief Get the path of file
          *
-         * \param dirname The destination directory
+         * @return The path
          */
-        void cd(const std::string &dirname);
+        std::string get_path() const;
 
         /**
-         * \brief Get the error message
+         * @brief Get the canonicalized absolute path
          *
-         * \return The error message
+         * @param pathname The pathname
+         *
+         * @return The canonicalized absolute path
          */
-        char *get_error();
+        static std::string get_absolute_path(const std::string &pathname);
+
+        /**
+         * @brief Get the name of the parent path
+         *
+         * @return The name of the parent path, "" if not found
+         */
+        std::string get_parent() const;
+
+        /**
+         * @brief Get the canonicalized absolute path
+         *
+         * @return The canonicalized absolute path
+         */
+        std::string get_absolute_path() const;
+
+        /**
+         * @brief Get the last-modified time
+         *
+         * @param pathname The file pathname
+         *
+         * @return The last-modified time representing the number of seconds
+         *         elapsed since the Epoch, 1970-01-01 00:00:00 +0000 (UTC)
+         *         when successed, 0 when failed
+         */
+        static time_t last_modified(const std::string &pathname);
+
+        /**
+         * @brief Get the last-modified time
+         *
+         * @return The last-modified time representing the number of seconds
+         *         elapsed since the Epoch, 1970-01-01 00:00:00 +0000 (UTC)
+         *         when successed, 0 when failed
+         */
+        time_t last_modified() const;
+
+        /**
+         * @brief Get the time string
+         *
+         * @param t The number of seconds elapsed since the Epoch, 1970-01-01
+         *          00:00:00 +0000 (UTC)
+         * @param format The time format, the same as strftime(), default:
+         *               "%a %b %d %H:%M:%S %Y"
+         *
+         * @return The time string, default format: Www Mmm dd hh:mm:ss yyyy
+         */
+        static std::string get_time_str(const time_t &t, const std::string
+                        &format = std::string{"%a %b %d %H:%M:%S %Y"});
+
+        /**
+         * @brief Get the file @pathname's size
+         *
+         * @param pathname The file pathname
+         *
+         * @return The file size in bytes, 0 when the file not exists or it's a
+         *         directory
+         */
+        static long get_size(const std::string &pathname);
+
+        /**
+         * @brief Get the file size
+         *
+         * @return The file size in bytes, 0 when the file not exists or it's a
+         *         directory
+         */
+        long get_size() const;
+
+        /**
+         * @brief Check if the file @pathname is readable
+         *
+         * @param pathname The file pathname
+         *
+         * @return True when file is readable, false when not
+         */
+        static bool can_read(const std::string &pathname);
+
+        /**
+         * @brief Check if the file is readable
+         *
+         * @return True when file is readable, false when not
+         */
+        bool can_read() const;
+
+        /**
+         * @brief Check if the file @pathname is writable
+         *
+         * @param pathname The file pathname
+         *
+         * @return True when file is writable, false when not
+         */
+        static bool can_write(const std::string &pathname);
+
+        /**
+         * @brief Check if the file is writable
+         *
+         * @return True when file is writable, false when not
+         */
+        bool can_write() const;
+
+        /**
+         * @brief Check if the file is executable
+         *
+         * @param pathname The file pathname
+         *
+         * @return True when file is executable, false when not
+         */
+        static bool can_execute(const std::string &pathname);
+
+        /**
+         * @brief Check if the file is executable
+         *
+         * @return True when file is executable, false when not
+         */
+        bool can_execute() const;
+
+        /**
+         * @brief List all files and subdirectories in the directory
+         *
+         * @param pathname The directory path
+         *
+         * @return The file list vector, or void vector when the file is not
+         *         exists or is not a directory
+         */
+        static std::vector<std::string> list(const std::string &pathname);
+
+        /**
+         * @brief List all files and subdirectories in the directory
+         *
+         * @return The file list vector, or void vector when the file is not
+         *         exists or is not a directory
+         */
+        std::vector<std::string> list() const;
+
+        /**
+         * @brief Get the extension of file @pathname
+         *
+         * @param pathname The pathname
+         *
+         * @return The extension, "" when not found
+         */
+        static std::string get_extension(const std::string &pathname);
+
+        /**
+         * @brief Get the extension of the file
+         *
+         * @return The extension, "" when not found
+         */
+        std::string get_extension() const;
 
 private:
-        std::string filename;   // the current filename
-        FILE *fp;               // point to the current file
-
-        std::string dir;        // the current directory
-        // list of all unhidden files in the current directory
-        std::vector<std::string> file_list;
-        size_t index;           // the current file index in the file_list
-
-        char error_msg[MSG_LEN];        // the error message
-
-private:
         /**
-         * \brief Open a file by a specific mode
+         * @brief Get the last separator in the pathname
          *
-         * \param filename The filename
-         * \param mode The specific mode, same as stdandard function fopen()
-         *
-         * \return 0 when succeeded and -1 when failed, use get_error() to
-         * get the error message
-         *
-         * \sa open()
-         * \sa close()
+         * @return The index of the last separator, std::string::npos if not
+         *         found
          */
-        int open_file(const std::string &filename, const std::string &mode);
-
-        /**
-         * \brief Set the error message
-         *
-         * \param The message you want to set
-         */
-        void set_error(const char *const msg);
+        std::string::size_type find_last_separator() const;
 };
 
 #endif
