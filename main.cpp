@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
                         filelist.end(), file.get_name()) - filelist.begin();
 
         engnie->set_window_title(file.get_name());
-        engnie->load_texture(dir.get_path() + dir.separator + file.get_path());
+        engnie->load_texture(dir.get_path() + dir.separator + file.get_name());
         engnie->fit_window();
 
         bool run = true;
