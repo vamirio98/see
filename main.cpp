@@ -2,7 +2,7 @@
  * main.cpp -
  *
  * Created by Haoyuan Li on 2021/07/14
- * Last Modified: 2021/08/14 22:11:35
+ * Last Modified: 2021/08/14 23:54:14
  */
 
 #include <vector>
@@ -20,6 +20,7 @@ using std::string;
 
 constexpr Uint32 fps = 25;
 constexpr Uint32 ticks_per_frame = 1000 / fps;
+const std::vector<string> support_format{"jpg", "jpeg", "png"};
 
 int main(int argc, char *argv[])
 {
@@ -34,14 +35,30 @@ int main(int argc, char *argv[])
         File file;
         File dir;
         file.bind(argv[1]);
-        dir.bind(file.get_parent() == "" ? "." : file.get_parent());
+        if (file.is_directory())
+                dir.bind(argv[1]);
+        else
+                dir.bind(file.get_parent() == "" ? "." : file.get_parent());
         std::vector<string> filelist = dir.list();
+        auto iter = filelist.begin();
+        while (iter != filelist.end()) {
+                if (std::find(support_format.begin(), support_format.end(),
+                                        File::get_extension(*iter)) ==
+                                        support_format.end())
+                        iter = filelist.erase(iter);
+                else
+                        ++iter;
+        }
         std::sort(filelist.begin(), filelist.end());
+        if (file.is_directory()) {
+                file.unbind();
+                file.bind(filelist[0]);
+        }
         decltype(filelist.size()) index = std::find(filelist.begin(),
                         filelist.end(), file.get_name()) - filelist.begin();
 
         engnie->set_window_title(file.get_name());
-        engnie->load_texture(file.get_path());
+        engnie->load_texture(dir.get_path() + dir.separator + file.get_path());
         engnie->fit_window();
 
         bool run = true;
