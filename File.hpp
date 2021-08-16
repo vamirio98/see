@@ -2,7 +2,7 @@
  * File.hpp - offer the basic multi-platform file operation
  *
  * Created by Haoyuan Li on 2021/08/11
- * Last Modified: 2021/08/14 21:46:48
+ * Last Modified: 2021/08/16 00:04:08
  */
 
 #ifndef FILE_HPP
@@ -320,12 +320,108 @@ public:
          */
         std::string get_extension() const;
 
+        /**
+         * @brief Create a new file
+         *
+         * @param pathname The name of the new file
+         *
+         * @return True if the file does not exist and successfully created,
+         *         false if the named file already exists or can not create
+         */
+        static bool create_new_file(const std::string &pathname);
+
+        /**
+         * @brief Create a new file
+         *
+         * @return True if the file does not exist and successfully created,
+         *         false if the named file already exists or can not create
+         */
+        bool create_new_file();
+
+        /**
+         * @brief Remove a file or an empty directory
+         *
+         * @param pathname The name of the file or directory to remove
+         *
+         * @return Ture if and only if the file or directory is successfully
+         *         removed, false otherwise
+         */
+        static bool remove(const std::string &pathname);
+
+        /**
+         * @brief Remove a file or an empty directory
+         *
+         * @return Ture if and only if the file or directory is successfully
+         *         removed, false otherwise
+         */
+        bool remove();
+
+#if defined(__unix__)
+        /**
+         * @brief Crete a directory with the specified permission
+         *
+         * @param pathname The name of the directory to create
+         * @param mode The permission, default: 0755
+         *
+         * @return Ture when directory was created, false otherwise
+         */
+        static bool mkdir(const std::string &pathname, mode_t mode = 0755);
+
+        /**
+         * @brief Crete a directory
+         *
+         * @param mode The permission, default: 0755
+         *
+         * @return Ture when directory was created, false otherwise
+         */
+        bool mkdir(mode_t mode = 0755);
+#elif defined(_MSC_VER)
+        /**
+         * @brief Crete a directory with the specified permission
+         *
+         * @param pathname The name of the directory to create
+         *
+         * @return Ture when directory was created, false otherwise
+         */
+        static bool mkdir(const std::string &pathname);
+
+        /**
+         * @brief Crete a directory
+         *
+         * @return Ture when directory was created, false otherwise
+         */
+        bool mkdir();
+#endif
+
+        /**
+         * @brief Move a file or directory
+         *
+         * @param src The source pathname
+         * @param dest The destination pathname
+         *
+         * @return True when move file or directory successfully,
+         *         false otherwise
+         */
+        static bool move(const std::string &src, const std::string &dest);
+
+        /**
+         * @brief Move a file or directory
+         *
+         * @param dest The destination pathname
+         *
+         * @return True when move file or directory successfully,
+         *         false otherwise
+         */
+        bool move(const std::string &dest);
+
 private:
         /**
          * @brief Get the last separator in the pathname
          *
          * @return The index of the last separator, std::string::npos if not
          *         found
+         *
+         * @sa get_error()
          */
         std::string::size_type find_last_separator() const;
 };
