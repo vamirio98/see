@@ -4,7 +4,7 @@
  * depend on SDL2
  *
  * Created by Haoyuan Li on 2021/07/17
- * Last Modified: 2021/07/26 15:31:19
+ * Last Modified: 2021/08/26 11:34:15
  */
 
 #ifndef ENGINE_HPP
@@ -42,7 +42,7 @@ private:
         const int init_h = 640;
         int win_w, win_h;
 
-        Logger *log;
+        Logger log_;
 
 private:
         Engine();

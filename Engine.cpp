@@ -2,7 +2,7 @@
  * Engine.cpp - the Engine class
  *
  * Created by Haoyuan Li on 2021/07/17
- * Last Modified: 2021/07/26 15:56:28
+ * Last Modified: 2021/08/26 11:38:31
  */
 
 #include "Engine.hpp"
@@ -13,7 +13,7 @@
 using std::string;
 
 const string init_title{"See"};
-const string flog{"./see.log"};
+const string logfile{"./see.log"};
 
 Engine::Engine()
 {
@@ -25,27 +25,28 @@ Engine::~Engine()
 
 void Engine::init()
 {
-        auto log = Logger::get_instance();
-        if (!log->init(flog)) {
+        if (!log_.init(logfile)) {
                 fprintf(stderr, "[Error] couldn't open log file %s\n",
-                                flog.c_str());
+                                logfile.c_str());
                 exit(-1);
         }
         if (SDL_Init(SDL_INIT_VIDEO)) {
-                log->error("initialize failed");
+                log_.fatal("initialize failed\n");
                 exit(-1);
         }
         create_window();
         if (!win) {
-                log->error("couldn't create window");
+                log_.fatal("couldn't create window\n");
+                exit(-1);
         }
         set_window_title(init_title);
         create_renderer();
         if (!renderer) {
-                log->error("couldn't create renderer");
+                log_.fatal("couldn't create renderer\n");
+                exit(-1);
         }
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-        log->msg("initialize seccessfully\n");
+        log_.info("initialize seccessfully\n");
 }
 
 void Engine::free()
@@ -54,8 +55,7 @@ void Engine::free()
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(win);
         SDL_Quit();
-        log->msg("exit seccessfully");
-        log->free();
+        log_.info("exit seccessfully\n");
 }
 
 void Engine::create_window()
