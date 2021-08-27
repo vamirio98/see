@@ -2,8 +2,14 @@
  * main.cpp -
  *
  * Created by Haoyuan Li on 2021/07/14
- * Last Modified: 2021/08/14 23:54:14
+ * Last Modified: 2021/08/27 00:02:16
  */
+
+#include "Engine.hpp"
+#include "File.hpp"
+#include "Timer.hpp"
+
+#include "see_config.h"
 
 #include <vector>
 #include <string>
@@ -12,9 +18,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_video.h>
 #include <SDL2/SDL_image.h>
-#include "Engine.hpp"
-#include "File.hpp"
-#include "Timer.hpp"
 
 using std::string;
 
@@ -28,6 +31,7 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "%s\n", "Usage: see <filename>");
 		return 1;
 	}
+        printf("See Version %d.%d\n", SEE_VERSION_MAJOR, SEE_VERSION_MINOR);
 
         auto engnie = Engine::get_instance();
         engnie->init();

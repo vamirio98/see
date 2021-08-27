@@ -1,0 +1,9 @@
+/**
+ * see_config.h.in -
+ *
+ * Created by Haoyuan Li on 2021/08/26
+ * Last Modified: 2021/08/26 23:53:01
+ */
+
+#define SEE_VERSION_MAJOR @SEE_VERSION_MAJOR@
+#define SEE_VERSION_MINOR @SEE_VERSION_MINOR@
