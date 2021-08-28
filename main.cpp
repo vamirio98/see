@@ -2,7 +2,7 @@
  * main.cpp -
  *
  * Created by Haoyuan Li on 2021/07/14
- * Last Modified: 2021/08/27 00:02:16
+ * Last Modified: 2021/08/28 10:31:13
  */
 
 #include "Engine.hpp"
@@ -21,8 +21,8 @@
 
 using std::string;
 
-constexpr Uint32 fps = 25;
-constexpr Uint32 ticks_per_frame = 1000 / fps;
+constexpr uint32_t fps = 25;
+constexpr uint32_t ticks_per_frame = 1000 / fps;
 const std::vector<string> support_format{"jpg", "jpeg", "png"};
 
 int main(int argc, char *argv[])
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
 
         engnie->set_window_title(file.get_name());
         engnie->load_texture(dir.get_path() + dir.separator + file.get_name());
-        engnie->fit_window();
+        engnie->fit_window_size();
 
         bool run = true;
         SDL_Event e;
@@ -93,12 +93,12 @@ int main(int argc, char *argv[])
                                         }
                                 engnie->load_texture(file.get_absolute_path());
                                 engnie->set_window_title(file.get_name());
-                                engnie->fit_window();
+                                engnie->fit_window_size();
                                 break;
                         case SDL_WINDOWEVENT:
                                 switch (e.window.event) {
                                 case SDL_WINDOWEVENT_RESIZED:
-                                        engnie->fit_window();
+                                        engnie->fit_window_size();
                                 }
                         default:
                                 break;
@@ -111,6 +111,6 @@ int main(int argc, char *argv[])
                 if (ticks < ticks_per_frame)
                         SDL_Delay(ticks_per_frame - ticks);
 	}
-        engnie->free();
+        engnie->free_instance();
         return 0;
 }
