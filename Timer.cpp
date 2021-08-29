@@ -1,76 +1,69 @@
 /**
  * Timer.cpp - the Timer class
  *
- * depend on SDL2, a timer instance can run not more than ~49 days, see
- * SDL_timer.h for more information
- *
  * Created by Haoyuan Li on 2021/07/26
- * Last Modified: 2021/07/26 15:34:03
+ * Last Modified: 2021/08/29 10:39:16
  */
 
 #include "Timer.hpp"
-#include <SDL2/SDL_timer.h>
 
-Timer::Timer()
-{
-        start_ms = 0;
-        pause_ms = 0;
-        started = false;
-        paused = false;
-}
+#include <ctime>
 
 void Timer::start()
 {
-        started = true;
-        paused = false;
-        start_ms = SDL_GetTicks();
-        pause_ms = 0;
+        started_ = true;
+        paused_ = false;
+        start_ms_ = get_sys_ticks();
+        pause_ms_ = 0;
 }
 
 void Timer::stop()
 {
-        started = false;
-        paused = false;
-        start_ms = 0;
-        pause_ms = 0;
+        started_ = false;
+        paused_ = false;
+        start_ms_ = 0;
+        pause_ms_ = 0;
 }
 
 void Timer::pause()
 {
-        if (started && !paused) {
-                paused = true;
-                pause_ms = SDL_GetTicks() - start_ms;
-                start_ms = 0;
+        if (started_ && !paused_) {
+                paused_ = true;
+                pause_ms_ = get_sys_ticks() - start_ms_;
+                start_ms_ = 0;
         }
 }
 
 void Timer::resume()
 {
-        if (started && paused) {
-                paused = false;
-                start_ms = SDL_GetTicks() - pause_ms;
-                pause_ms = 0;
+        if (started_ && paused_) {
+                paused_ = false;
+                start_ms_ = get_sys_ticks() - pause_ms_;
+                pause_ms_ = 0;
         }
 }
 
-Uint32 Timer::get_ticks()
+long long Timer::get_ticks()
 {
-        Uint32 time = 0;
-        if (started) {
-                if (paused)
-                        time = pause_ms;
-                else
-                        time = SDL_GetTicks() - start_ms;
-        }
-        return time;
+        long long t = 0;
+        if (started_)
+                t = paused_ ? pause_ms_ : get_sys_ticks() - start_ms_;
+        return t;
 }
 
 bool Timer::is_started()
 {
-        return started;
+        return started_;
 }
 
 bool Timer::is_paused()
 {
-        return started && paused;
+        return started_ && paused_;
+}
+
+long long Timer::get_sys_ticks()
+{
+        struct timespec spec;
+        clock_gettime(CLOCK_REALTIME, &spec);
+        return (spec.tv_sec * 1000LL + spec.tv_nsec / 1000000LL);
 }

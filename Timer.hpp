@@ -1,68 +1,70 @@
 /**
  * Timer.hpp - the Timer class
  *
- * depend on SDL2, a timer instance can run not more than ~49 days, see
- * SDL_timer.h for more information
- *
  * Created by Haoyuan Li on 2021/07/26
- * Last Modified: 2021/07/26 15:38:09
+ * Last Modified: 2021/08/29 10:36:22
  */
 
-#ifndef TIMER_HPP
-#define TIMER_HPP
-
-#include <SDL2/SDL_timer.h>
+#ifndef TIMER_HPP_
+#define TIMER_HPP_
 
 class Timer {
 public:
-        Timer();
+        Timer() = default;
         ~Timer() = default;
 
         /**
-         * \brief Start timing
+         * @brief Start timing
          */
         void start();
 
         /**
-         * \brief Stop timing
+         * @brief Stop timing
          */
         void stop();
 
         /**
-         * \brief Pause timing
+         * @brief Pause timing
          */
         void pause();
 
         /**
-         * \brief Resume timing
+         * @brief Resume timing
          */
         void resume();
 
         /**
-         * \brief Get the timer running time
+         * @brief Get the timer running time
          *
-         * \return The running time, ms
+         * @return The running time, ms
          */
-        Uint32 get_ticks();
-
+        long long get_ticks();
 
         /**
-         * \brief Check whether the timer is running
+         * @brief Check whether the timer is running
          */
         bool is_started();
 
         /**
-         * \brief Check whether the timer is paused
+         * @brief Check whether the timer is paused
          */
         bool is_paused();
 
 private:
-        Uint32 start_ms;        // the clock time when the timer started, ms
-        Uint32 pause_ms;        // the clock time when the timer paused, ms
+        long long start_ms_{0};   // the clock time when the timer started, ms
+        long long pause_ms_{0};   // the clock time when the timer paused, ms
 
         // the timer status
-        bool started;
-        bool paused;
+        bool started_{false};
+        bool paused_{false};
+
+private:
+        /**
+         * @brief Get the real-time clock for the system
+         *
+         * @return The real-time in milliseconds
+         */
+        static long long get_sys_ticks();
 };
 
 #endif

@@ -2,7 +2,7 @@
  * Logger.cpp - a simple Logger class
  *
  * Created by Haoyuan Li on 2021/07/20
- * Last Modified: 2021/08/26 12:35:51
+ * Last Modified: 2021/08/29 10:02:08
  */
 
 #include "Logger.hpp"
@@ -28,36 +28,36 @@ bool Logger::init(const string &pathname)
 
 void Logger::trace(const string &msg)
 {
-        string message = msg;
-        add_message(message.insert(0, " [T] "));
+        string message{" [T] "};
+        add_message(message + msg);
 }
 
 void Logger::debug(const string &msg)
 {
-        string message = msg;
-        add_message(message.insert(0, " [D] "));
+        string message{" [D] "};
+        add_message(message + msg);
 }
 
 void Logger::info(const string &msg)
 {
-        string message = msg;
-        add_message(message.insert(0, " [I] "));
+        string message{" [I] "};
+        add_message(message + msg);
 }
 
 void Logger::warning(const string &msg)
 {
-        string message = msg;
-        add_message(message.insert(0, " [W] "));
+        string message{" [W] "};
+        add_message(message + msg);
 }
 
 void Logger::error(const string &msg)
 {
-        string message = msg;
-        add_message(message.insert(0, " [E] "));
+        string message{" [E] "};
+        add_message(message + msg);
 }
 
 void Logger::fatal(const string &msg)
 {
-        string message = msg;
-        add_message(message.insert(0, " [F] "));
+        string message{" [F] "};
+        add_message(message + msg);
 }
