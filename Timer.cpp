@@ -2,12 +2,12 @@
  * Timer.cpp - the Timer class
  *
  * Created by Haoyuan Li on 2021/07/26
- * Last Modified: 2021/08/29 10:39:16
+ * Last Modified: 2021/08/29 12:43:37
  */
 
 #include "Timer.hpp"
 
-#include <ctime>
+#include <chrono>
 
 void Timer::start()
 {
@@ -63,7 +63,7 @@ bool Timer::is_paused()
 
 long long Timer::get_sys_ticks()
 {
-        struct timespec spec;
-        clock_gettime(CLOCK_REALTIME, &spec);
-        return (spec.tv_sec * 1000LL + spec.tv_nsec / 1000000LL);
+        return static_cast<long long>(std::chrono::time_point_cast
+                <std::chrono::milliseconds>(std::chrono::steady_clock::now())
+                .time_since_epoch().count());
 }
