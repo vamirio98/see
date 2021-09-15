@@ -2,7 +2,7 @@
  * main.cpp -
  *
  * Created by Haoyuan Li on 2021/07/14
- * Last Modified: 2021/08/28 10:31:13
+ * Last Modified: 2021/09/15 10:43:09
  */
 
 #include "Engine.hpp"
@@ -66,6 +66,7 @@ int main(int argc, char *argv[])
         engnie->fit_window_size();
 
         bool run = true;
+	bool change = true;
         SDL_Event e;
         Timer cap_fps;
 	while (run) {
@@ -94,18 +95,27 @@ int main(int argc, char *argv[])
                                 engnie->load_texture(file.get_absolute_path());
                                 engnie->set_window_title(file.get_name());
                                 engnie->fit_window_size();
+				change = true;
                                 break;
                         case SDL_WINDOWEVENT:
                                 switch (e.window.event) {
                                 case SDL_WINDOWEVENT_RESIZED:
                                         engnie->fit_window_size();
+					change = true;
+					break;
+				default:
+					break;
                                 }
+				break;
                         default:
                                 break;
                         }
-                        engnie->render_clear();
-                        engnie->render_copy();
-                        engnie->render_present();
+			if (change) {
+				engnie->render_clear();
+				engnie->render_copy();
+				engnie->render_present();
+				change = false;
+			}
 		}
                 auto ticks = cap_fps.get_ticks();
                 if (ticks < ticks_per_frame)

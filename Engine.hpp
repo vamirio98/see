@@ -4,7 +4,7 @@
  * encapsulate part of the SDL2 function
  *
  * Created by Haoyuan Li on 2021/07/17
- * Last Modified: 2021/08/28 10:26:42
+ * Last Modified: 2021/09/15 10:40:10
  */
 
 #ifndef ENGINE_HPP
@@ -16,6 +16,7 @@
 #include <string>
 
 #include "Logger.hpp"
+#include "File.hpp"
 
 using See_window = SDL_Window;
 using See_renderer = SDL_Renderer;
